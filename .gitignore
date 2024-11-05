@@ -1,0 +1,6 @@
+**/__pycache__
+**/venv
+**/tp1_key2.pem
+.idea
+aws_creds.json
+*.pem
