@@ -45,7 +45,7 @@ def main():
 
     # Create one t2.micro and one t2.large instance
     print("Creating one t2.micro instance...")
-    micro_instances = create_ec2_instance('t2.micro', 1, key_name, security_group_id)
+    micro_instances = create_ec2_instance('t2.micro', 3, key_name, security_group_id)
     
     # Combine the instance IDs from both instance types
     instance_ips = [instance.public_ip_address for instance in micro_instances]
@@ -60,8 +60,9 @@ def main():
     sleep(5)
 
     print("Deploying to instance...")
-    deploy_to_instance(instance_ips[0])
-    print(f"Completed for {instance_ips[0]}")
+    deploy_to_instances_concurrently(instance_ips)
+
+    print(f"Completed for {instance_ips}")
 
 if __name__ == "__main__":
     main()

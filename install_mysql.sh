@@ -41,6 +41,6 @@ MYSQL_CMD
     sudo sysbench /usr/share/sysbench/oltp_read_only.lua --mysql-db=sakila --mysql-user="root" --mysql-password="" run > /home/ubuntu/sysbench_${1}-${2}-${3}-${4}.txt 2>&1
 EOF
 
-scp -i "$KEY_PATH" "$REMOTE_USER@${1}.${2}.${3}.${4}:/home/ubuntu/sysbench_${1}-${2}-${3}-${4}.txt" results
+scp -i "$KEY_PATH" -o StrictHostKeyChecking=no "$REMOTE_USER@${1}.${2}.${3}.${4}:/home/ubuntu/sysbench_${1}-${2}-${3}-${4}.txt" results
 
 echo "Deployment complete!"
