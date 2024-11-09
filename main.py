@@ -10,9 +10,7 @@ def deploy_to_instance(ip_address):
     git_bash_path = "C:/Program Files/Git/bin/bash.exe"
 
     try:
-        print(f"BEGIN SUBPROCESS RUN for {ip_address}")
         result = subprocess.run([git_bash_path, "./install_mysql.sh", *ip_parts], check=True)
-        print(f"Deployment successful for {ip_address}: {result.stdout}")
     except subprocess.CalledProcessError as e:
         print(f"Error during deployment for {ip_address}: {e.stderr}")
 
