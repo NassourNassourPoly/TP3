@@ -4,6 +4,18 @@ import json
 import concurrent.futures
 from create_ec2_instance import create_ec2_instance
 
+def configure_proxy(ip_address, manager_ip, worker1_ip, worker2_ip):
+    ip_parts = ip_address.split('.')
+    git_bash_path = "C:/Program Files/Git/bin/bash.exe"
+
+    try:
+        # Pass manager_private_ip and id as additional arguments to the script
+        result = subprocess.run(
+            [git_bash_path, "./install_fastapi.sh", *ip_parts, manager_ip, worker1_ip, worker2_ip, str(id)], 
+            check=True
+        )
+    except subprocess.CalledProcessError as e:
+        print(f"Error during deployment for {ip_address}: {e.stderr}")
 
 def configure_slave(ip_address, manager_private_ip, id):
     ip_parts = ip_address.split('.')
@@ -83,8 +95,16 @@ def main():
     configure_slave(instance_public_ips[1], instance_private_ips[0], 2)
     configure_slave(instance_public_ips[2], instance_private_ips[0], 3)
 
+    print("Configuring proxy")
+    proxy_instance = create_ec2_instance('t2.large', 1, key_name, security_group_id)
+    wait_for_deployment()
+    configure_proxy(proxy_instance[0].public_ip_address,
+                    instance_public_ips[0], 
+                    instance_public_ips[1], 
+                    instance_public_ips[2])
 
-    print(f"Completed for {instance_public_ips}")
+    print(f"SQL cluster instances: {instance_public_ips}")
+    print(f"Proxy: {proxy_instance[0].public_ip_address}")
 
 
 
