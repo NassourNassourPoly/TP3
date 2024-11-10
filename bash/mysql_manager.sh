@@ -11,6 +11,24 @@ sudo apt-get update && sudo apt-get install -y mysql-server
 
 # Configure MySQL for replication
 echo "Configuring MySQL for replication..."
+
+# Remove any existing bind-address and mysqlx-bind-address settings
+echo "Removing any previous bind-address and mysqlx-bind-address settings..."
+sudo sed -i '/^bind-address/d' /etc/mysql/mysql.conf.d/mysqld.cnf
+sudo sed -i '/^mysqlx-bind-address/d' /etc/mysql/mysql.conf.d/mysqld.cnf
+
+# Update bind-address to 0.0.0.0 to allow external connections
+echo "Setting bind-address to 0.0.0.0..."
+sudo sed -i '/\[mysqld\]/a \
+bind-address = 0.0.0.0' /etc/mysql/mysql.conf.d/mysqld.cnf
+
+# Update mysqlx-bind-address to 0.0.0.0 to allow external connections for MySQL X protocol (if applicable)
+echo "Setting mysqlx-bind-address to 0.0.0.0..."
+sudo sed -i '/\[mysqld\]/a \
+mysqlx-bind-address = 0.0.0.0' /etc/mysql/mysql.conf.d/mysqld.cnf
+
+# Add replication-specific configuration
+echo "Adding replication configuration..."
 sudo sed -i '/\[mysqld\]/a \
 server-id = 1\n\
 log_bin = /var/log/mysql/mysql-bin.log\n\

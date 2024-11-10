@@ -1,13 +1,19 @@
 #!/bin/bash
 
 # Variables
-MASTER_IP="master_private_ip"  # Replace with the master node's private IP
-MYSQL_ROOT_PASSWORD="root_password"  # Change to your root password
+MASTER_IP="$1"  # Replace with the master node's private IP
+MYSQL_ROOT_PASSWORD=""  # Change to your root password
 REPLICATION_USER="replicator"
 REPLICATION_PASSWORD=""  # Change to the password set on the master
-SERVER_ID=$1  # Pass a unique server ID as a script argument
-MASTER_LOG_FILE="file_from_master_status"  # Replace with the File from SHOW MASTER STATUS
-MASTER_LOG_POS="position_from_master_status"  # Replace with the Position from SHOW MASTER STATUS
+SERVER_ID=$2  # Pass a unique server ID as a script argument
+MASTER_LOG_FILE="mysql-bin.000001"  # Replace with the File from SHOW MASTER STATUS
+MASTER_LOG_POS="778"  # Replace with the Position from SHOW MASTER STATUS
+
+# Check if all 4 IP parts are provided
+if [ -z "$1" ] || [ -z "$2" ]; then
+  echo "Usage: ./install_mysql.sh <part1> <part2> <part3> <part4>"
+  exit 1
+fi
 
 # Update and install MySQL
 echo "Updating packages and installing MySQL..."
