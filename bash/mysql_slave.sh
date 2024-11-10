@@ -15,10 +15,6 @@ if [ -z "$1" ] || [ -z "$2" ]; then
   exit 1
 fi
 
-# Update and install MySQL
-echo "Updating packages and installing MySQL..."
-sudo apt-get update && sudo apt-get install -y mysql-server
-
 # Configure MySQL for replication
 echo "Configuring MySQL for replication..."
 sudo sed -i "/\[mysqld\]/a \

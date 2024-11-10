@@ -5,10 +5,6 @@ MYSQL_ROOT_PASSWORD=""  # Change to your root password
 REPLICATION_USER="replicator"
 REPLICATION_PASSWORD=""  # Change to a secure password
 
-# Update and install MySQL
-echo "Updating packages and installing MySQL..."
-sudo apt-get update && sudo apt-get install -y mysql-server
-
 # Configure MySQL for replication
 echo "Configuring MySQL for replication..."
 
