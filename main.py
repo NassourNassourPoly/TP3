@@ -1,5 +1,6 @@
 import subprocess
 from time import sleep
+import time
 import json
 import concurrent.futures
 from create_ec2_instance import create_ec2_instance
@@ -63,6 +64,8 @@ def wait_for_deployment():
     sleep(5)
 
 def main():
+    start = time.time()
+
     # Load the JSON file
     with open('AWS_creds.json', 'r') as file:
         creds = json.load(file)
@@ -103,10 +106,10 @@ def main():
                     instance_public_ips[1], 
                     instance_public_ips[2])
 
+    end = time.time()
     print(f"SQL cluster instances: {instance_public_ips}")
     print(f"Proxy: {proxy_instance[0].public_ip_address}")
-
-
+    print(f"Time taken to run the code was {end-start} seconds")
 
 if __name__ == "__main__":
     main()

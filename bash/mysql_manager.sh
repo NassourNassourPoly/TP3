@@ -39,6 +39,8 @@ echo "Setting up replication user..."
 sudo mysql -u root -p="$MYSQL_ROOT_PASSWORD" -e "
 CREATE USER '$REPLICATION_USER'@'%' IDENTIFIED BY '$REPLICATION_PASSWORD';
 GRANT REPLICATION SLAVE ON *.* TO '$REPLICATION_USER'@'%';
+CREATE USER 'remote_admin'@'%' IDENTIFIED BY '';
+GRANT ALL PRIVILEGES ON sakila.* TO 'remote_admin'@'%';
 FLUSH PRIVILEGES;
 SHOW MASTER STATUS;
 "
