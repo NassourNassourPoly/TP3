@@ -51,6 +51,9 @@ CHANGE MASTER TO
     MASTER_LOG_POS = $MASTER_LOG_POS;
 START SLAVE;
 SHOW SLAVE STATUS\G
+CREATE USER '$REPLICATION_USER'@'%' IDENTIFIED BY '$REPLICATION_PASSWORD';
+GRANT ALL PRIVILEGES ON sakila.* TO '$REPLICATION_USER'@'%';
+FLUSH PRIVILEGES;
 "
 
 echo "Worker setup complete. Check the output to ensure replication is running correctly."

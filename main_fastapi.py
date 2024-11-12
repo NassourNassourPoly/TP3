@@ -4,8 +4,9 @@ import mysql.connector
 import random
 import socket
 import time
+from contextlib import asynccontextmanager
 
-app = FastAPI()
+
 default_read_query = "SELECT * FROM store WHERE store_id = 1"
 default_write_query = f"INSERT INTO testing_table (number) VALUES (500)"
 
@@ -18,7 +19,7 @@ MANAGER_DB = {
 }
 WORKER_DBS = [
     {"host": os.getenv("WORKER1_IP"), "user": "replicator", "password": "", "database": "sakila"},
-    {"host": os.getenv("WORKER2_IP"), "user": "root", "password": "", "database": "sakila"}
+    {"host": os.getenv("WORKER2_IP"), "user": "replicator", "password": "", "database": "sakila"}
 ]
 
 # Helper function to connect to MySQL and execute a query
@@ -40,6 +41,19 @@ def execute_query(db_config, query):
         return result
     except mysql.connector.Error as err:
         raise HTTPException(status_code=500, detail=f"Database error: {err}")
+    
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    query = "CREATE TABLE IF NOT EXISTS testing_table (id INT PRIMARY KEY AUTO_INCREMENT, number INT);"
+    try:
+        execute_query(MANAGER_DB, query)
+        print("Table 'testing_table' ensured on startup.")
+    except HTTPException as e:
+        print(f"Failed to create table on startup: {e.detail}")
+    
+    yield  # Allow the application to start up
+
+app = FastAPI(lifespan=lifespan)
 
 # Routing Strategy 1: Direct Hit (sends all write requests to manager)
 @app.post("/write")
