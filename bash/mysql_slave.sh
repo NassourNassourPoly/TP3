@@ -6,14 +6,29 @@ MYSQL_ROOT_PASSWORD=""  # Change to your root password
 REPLICATION_USER="replicator"
 REPLICATION_PASSWORD=""  # Change to the password set on the master
 SERVER_ID=$2  # Pass a unique server ID as a script argument
-MASTER_LOG_FILE="mysql-bin.000001"  # Replace with the File from SHOW MASTER STATUS
-MASTER_LOG_POS="778"  # Replace with the Position from SHOW MASTER STATUS
+MASTER_LOG_FILE="$3"  # Replace with the File from SHOW MASTER STATUS
+MASTER_LOG_POS="$4"  # Replace with the Position from SHOW MASTER STATUS
 
 # Check if all 4 IP parts are provided
 if [ -z "$1" ] || [ -z "$2" ]; then
   echo "Usage: ./install_mysql.sh <part1> <part2> <part3> <part4>"
   exit 1
 fi
+
+# Remove any existing bind-address and mysqlx-bind-address settings
+echo "Removing any previous bind-address and mysqlx-bind-address settings..."
+sudo sed -i '/^bind-address/d' /etc/mysql/mysql.conf.d/mysqld.cnf
+sudo sed -i '/^mysqlx-bind-address/d' /etc/mysql/mysql.conf.d/mysqld.cnf
+
+# Update bind-address to 0.0.0.0 to allow external connections
+echo "Setting bind-address to 0.0.0.0..."
+sudo sed -i '/\[mysqld\]/a \
+bind-address = 0.0.0.0' /etc/mysql/mysql.conf.d/mysqld.cnf
+
+# Update mysqlx-bind-address to 0.0.0.0 to allow external connections for MySQL X protocol (if applicable)
+echo "Setting mysqlx-bind-address to 0.0.0.0..."
+sudo sed -i '/\[mysqld\]/a \
+mysqlx-bind-address = 0.0.0.0' /etc/mysql/mysql.conf.d/mysqld.cnf
 
 # Configure MySQL for replication
 echo "Configuring MySQL for replication..."

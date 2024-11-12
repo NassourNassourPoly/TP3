@@ -18,14 +18,14 @@ def configure_proxy(ip_address, manager_ip, worker1_ip, worker2_ip):
     except subprocess.CalledProcessError as e:
         print(f"Error during deployment for {ip_address}: {e.stderr}")
 
-def configure_slave(ip_address, manager_private_ip, id):
+def configure_slave(ip_address, manager_private_ip, id, file, position):
     ip_parts = ip_address.split('.')
     git_bash_path = "C:/Program Files/Git/bin/bash.exe"
 
     try:
         # Pass manager_private_ip and id as additional arguments to the script
         result = subprocess.run(
-            [git_bash_path, "./configure_slave.sh", *ip_parts, manager_private_ip, str(id)], 
+            [git_bash_path, "./configure_slave.sh", *ip_parts, manager_private_ip, str(id), file, str(position)], 
             check=True
         )
     except subprocess.CalledProcessError as e:
@@ -95,8 +95,13 @@ def main():
 
     print("Configuring MySQL cluster")
     run_bash(instance_public_ips[0], "./configure_manager.sh")
-    configure_slave(instance_public_ips[1], instance_private_ips[0], 2)
-    configure_slave(instance_public_ips[2], instance_private_ips[0], 3)
+    subprocess.run(f'scp -i "nass.pem" "ubuntu@{instance_public_ips[0]}:/home/ubuntu/master_status.json" results')
+
+    with open('results/master_status.json', 'r') as file:
+        master_status = json.load(file)
+
+    configure_slave(instance_public_ips[1], instance_private_ips[0], 2, master_status["File"], master_status["Position"])
+    configure_slave(instance_public_ips[2], instance_private_ips[0], 3, master_status["File"], master_status["Position"])
 
     print("Configuring proxy")
     proxy_instance = create_ec2_instance('t2.large', 1, key_name, security_group_id)
@@ -108,6 +113,7 @@ def main():
 
     end = time.time()
     print(f"SQL cluster instances: {instance_public_ips}")
+    print(f"File, Position = {master_status["File"]}, {master_status["Position"]}")
     print(f"Proxy: {proxy_instance[0].public_ip_address}")
     print(f"Time taken to run the code was {end-start} seconds")
 

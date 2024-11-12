@@ -17,6 +17,6 @@ fi
 # Step 2: SSH into the EC2 instance and install necessary packages
 echo "Connecting to the instance and setting it up..."
 ssh -i "$KEY_PATH" -o StrictHostKeyChecking=no $REMOTE_USER@ec2-${1}-${2}-${3}-${4}.compute-1.amazonaws.com << EOF
-    ./mysql_slave.sh $5 $6
+    ./mysql_slave.sh $5 $6 $7 $8
 EOF
 echo "Deployment complete!"

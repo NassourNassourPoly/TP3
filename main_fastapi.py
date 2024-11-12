@@ -6,20 +6,18 @@ import socket
 import time
 
 app = FastAPI()
-default_read_query = "SELECT * FROM store LIMIT 10"
-
-write_id = 3
-default_write_query = f"INSERT INTO store (store_id, manager_staff_id, address_id, last_update) VALUES ({str(write_id)}, {str(write_id)}, {str(write_id)}, '2006-02-15 04:57:12')"
+default_read_query = "SELECT * FROM store WHERE store_id = 1"
+default_write_query = f"INSERT INTO testing_table (number) VALUES (500)"
 
 # Fetch IPs from environment variables
 MANAGER_DB = {
     "host": os.getenv("MANAGER_IP"),
-    "user": "remote_admin",
+    "user": "replicator",
     "password": "",
     "database": "sakila"
 }
 WORKER_DBS = [
-    {"host": os.getenv("WORKER1_IP"), "user": "root", "password": "", "database": "sakila"},
+    {"host": os.getenv("WORKER1_IP"), "user": "replicator", "password": "", "database": "sakila"},
     {"host": os.getenv("WORKER2_IP"), "user": "root", "password": "", "database": "sakila"}
 ]
 
@@ -47,7 +45,6 @@ def execute_query(db_config, query):
 @app.post("/write")
 def write_direct():
     affected_rows = execute_query(MANAGER_DB, default_write_query)
-    write_id += 1
     return {"status": "success", "affected_rows": affected_rows}  # Return the count of affected rows
 
 # Routing Strategy 1: Direct Hit for reading (sends all read requests to manager)

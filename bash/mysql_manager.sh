@@ -4,6 +4,7 @@
 MYSQL_ROOT_PASSWORD=""  # Change to your root password
 REPLICATION_USER="replicator"
 REPLICATION_PASSWORD=""  # Change to a secure password
+STATUS_FILE="master_status.json"  # File to save master status
 
 # Configure MySQL for replication
 echo "Configuring MySQL for replication..."
@@ -39,10 +40,21 @@ echo "Setting up replication user..."
 sudo mysql -u root -p="$MYSQL_ROOT_PASSWORD" -e "
 CREATE USER '$REPLICATION_USER'@'%' IDENTIFIED BY '$REPLICATION_PASSWORD';
 GRANT REPLICATION SLAVE ON *.* TO '$REPLICATION_USER'@'%';
-CREATE USER 'remote_admin'@'%' IDENTIFIED BY '';
-GRANT ALL PRIVILEGES ON sakila.* TO 'remote_admin'@'%';
+GRANT ALL PRIVILEGES ON sakila.* TO '$REPLICATION_USER'@'%';
 FLUSH PRIVILEGES;
 SHOW MASTER STATUS;
+USE sakila;
+CREATE TABLE testing_table (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    number INT
+);
 "
 
-echo "Master setup complete. Note down the File and Position values from the SHOW MASTER STATUS output."
+# Capture and save the SHOW MASTER STATUS output in JSON format
+echo "Capturing master status and saving to $STATUS_FILE..."
+MASTER_STATUS=$(sudo mysql -u root -p="$MYSQL_ROOT_PASSWORD" -e "SHOW MASTER STATUS;" \
+    --batch --skip-column-names | awk '{print "{\"File\": \"" $1 "\", \"Position\": " $2 "}"}')
+
+echo "$MASTER_STATUS" > "$STATUS_FILE"
+
+echo "Master setup complete. Master status saved to $STATUS_FILE."
