@@ -6,6 +6,7 @@ import socket
 import time
 from contextlib import asynccontextmanager
 
+# Proxy server
 
 default_read_query = "SELECT * FROM store WHERE store_id = 1"
 default_write_query = f"INSERT INTO testing_table (number) VALUES (500)"

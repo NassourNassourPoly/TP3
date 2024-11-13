@@ -1,10 +1,14 @@
 #!/bin/bash
 
+# This script is to be deployed on the slave instances. This allows configuration of the slaves.
+# Inputs: MASTER_IP, SERVER_ID, MASTER_LOG_FILE, MASTER_LOG_POS [See below for descriptions]
+# Outputs: None
+
 # Variables
 MASTER_IP="$1"  # Replace with the master node's private IP
-MYSQL_ROOT_PASSWORD=""  # Change to your root password
+MYSQL_ROOT_PASSWORD=""
 REPLICATION_USER="replicator"
-REPLICATION_PASSWORD=""  # Change to the password set on the master
+REPLICATION_PASSWORD=""
 SERVER_ID=$2  # Pass a unique server ID as a script argument
 MASTER_LOG_FILE="$3"  # Replace with the File from SHOW MASTER STATUS
 MASTER_LOG_POS="$4"  # Replace with the Position from SHOW MASTER STATUS
@@ -25,7 +29,7 @@ echo "Setting bind-address to 0.0.0.0..."
 sudo sed -i '/\[mysqld\]/a \
 bind-address = 0.0.0.0' /etc/mysql/mysql.conf.d/mysqld.cnf
 
-# Update mysqlx-bind-address to 0.0.0.0 to allow external connections for MySQL X protocol (if applicable)
+# Update mysqlx-bind-address to 0.0.0.0 to allow external connections for MySQL X protocol
 echo "Setting mysqlx-bind-address to 0.0.0.0..."
 sudo sed -i '/\[mysqld\]/a \
 mysqlx-bind-address = 0.0.0.0' /etc/mysql/mysql.conf.d/mysqld.cnf

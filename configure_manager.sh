@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Runs the configuration script for the manager instance.
+
 # Ensure the script exits if any command fails
 set -e
 
@@ -14,7 +16,7 @@ if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ]; then
   exit 1
 fi
 
-# Step 2: SSH into the EC2 instance and install necessary packages
+# Step 2: SSH into the EC2 instance
 echo "Connecting to the instance and setting it up..."
 ssh -i "$KEY_PATH" -o StrictHostKeyChecking=no $REMOTE_USER@ec2-${1}-${2}-${3}-${4}.compute-1.amazonaws.com << EOF
     ./mysql_manager.sh

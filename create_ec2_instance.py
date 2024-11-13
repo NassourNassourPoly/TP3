@@ -2,6 +2,8 @@ import boto3
 import boto3.session
 from botocore.exceptions import ClientError
 
+# Function to create an ec2 instance (taken from assignment 1)
+
 # Initialiser la ressource EC2 avec boto3 pour la région us-east-1
 ec2 = boto3.resource('ec2', region_name='us-east-1')
 

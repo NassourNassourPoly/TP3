@@ -14,13 +14,11 @@ if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ]; then
   exit 1
 fi
 
-# Step 1: Copy the FastAPI script to the EC2 instance
 echo "Transferring bash scripts file to the instance..."
 scp -i "$KEY_PATH" -o StrictHostKeyChecking=no "./bash/mysql_manager.sh" $REMOTE_USER@${1}.${2}.${3}.${4}:$REMOTE_DEST
 scp -i "$KEY_PATH" -o StrictHostKeyChecking=no "./bash/mysql_slave.sh" $REMOTE_USER@${1}.${2}.${3}.${4}:$REMOTE_DEST
 
 
-# Step 2: SSH into the EC2 instance and install necessary packages
 echo "Connecting to the instance and setting it up..."
 ssh -i "$KEY_PATH" -o StrictHostKeyChecking=no $REMOTE_USER@ec2-${1}-${2}-${3}-${4}.compute-1.amazonaws.com << EOF
     # Step 1: MySQL and sysbench installations

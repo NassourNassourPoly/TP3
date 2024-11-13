@@ -1,12 +1,15 @@
 #!/bin/bash
 
+# This script is to be deployed on the manager instance. This allows configuration of the manager.
+# Inputs: None
+# Outputs: master_status.json
+ 
 # Variables
-MYSQL_ROOT_PASSWORD=""  # Change to your root password
+MYSQL_ROOT_PASSWORD=""
 REPLICATION_USER="replicator"
-REPLICATION_PASSWORD=""  # Change to a secure password
-STATUS_FILE="master_status.json"  # File to save master status
+REPLICATION_PASSWORD=""
+STATUS_FILE="master_status.json"
 
-# Configure MySQL for replication
 echo "Configuring MySQL for replication..."
 
 # Remove any existing bind-address and mysqlx-bind-address settings
@@ -19,7 +22,7 @@ echo "Setting bind-address to 0.0.0.0..."
 sudo sed -i '/\[mysqld\]/a \
 bind-address = 0.0.0.0' /etc/mysql/mysql.conf.d/mysqld.cnf
 
-# Update mysqlx-bind-address to 0.0.0.0 to allow external connections for MySQL X protocol (if applicable)
+# Update mysqlx-bind-address to 0.0.0.0 to allow external connections for MySQL X protocol
 echo "Setting mysqlx-bind-address to 0.0.0.0..."
 sudo sed -i '/\[mysqld\]/a \
 mysqlx-bind-address = 0.0.0.0' /etc/mysql/mysql.conf.d/mysqld.cnf
