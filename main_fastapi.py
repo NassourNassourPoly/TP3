@@ -60,20 +60,20 @@ app = FastAPI(lifespan=lifespan)
 @app.post("/write")
 def write_direct():
     affected_rows = execute_query(MANAGER_DB, default_write_query)
-    return {"status": "success", "affected_rows": affected_rows}  # Return the count of affected rows
+    return {"status": "success", "affected_rows": affected_rows, "role": "manager", "ip": MANAGER_DB["host"]}  # Return the count of affected rows
 
 # Routing Strategy 1: Direct Hit for reading (sends all read requests to manager)
 @app.get("/read/direct")
 def read_direct():
     result = execute_query(MANAGER_DB, default_read_query)
-    return {"status": "success", "data": result}
+    return {"status": "success", "data": result, "role": "manager", "ip": MANAGER_DB["host"]}
 
 # Routing Strategy 2: Random (sends read requests to a random worker)
 @app.get("/read/random")
 def read_random():
     worker_db = random.choice(WORKER_DBS)
     result = execute_query(worker_db, default_read_query)
-    return {"status": "success", "data": result}
+    return {"status": "success", "data": result, "role": "worker", "ip": worker_db["host"]}
 
 # Routing Strategy 3: Customized (sends read to the lowest latency worker)
 def measure_latency(host):
@@ -84,13 +84,13 @@ def measure_latency(host):
         return float('inf')
     return time.time() - start
 
-@app.get("/read/optimized")
-def read_optimized():
+@app.get("/read/customized")
+def read_customized():
     # Measure latency and select the worker with the lowest latency
     latencies = [(db, measure_latency(db["host"])) for db in WORKER_DBS]
     best_db = min(latencies, key=lambda x: x[1])[0]
     result = execute_query(best_db, default_read_query)
-    return {"status": "success", "data": result}
+    return {"status": "success", "data": result, "role": "worker", "ip": best_db["host"]}
 
 # Testing endpoint for initial connectivity
 @app.get("/")
