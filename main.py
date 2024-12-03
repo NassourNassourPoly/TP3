@@ -5,6 +5,19 @@ import json
 import concurrent.futures
 from create_ec2_instance import create_ec2_instance
 
+def configure_routing(ip_address, route_ip):
+    ip_parts = ip_address.split('.')
+    git_bash_path = "C:/Program Files/Git/bin/bash.exe"
+
+    try:
+        # Pass manager_private_ip and id as additional arguments to the script
+        result = subprocess.run(
+            [git_bash_path, "./install_routing.sh", *ip_parts, route_ip], 
+            check=True
+        )
+    except subprocess.CalledProcessError as e:
+        print(f"Error during deployment for {ip_address}: {e.stderr}")
+
 def configure_proxy(ip_address, manager_ip, worker1_ip, worker2_ip):
     ip_parts = ip_address.split('.')
     git_bash_path = "C:/Program Files/Git/bin/bash.exe"
@@ -111,10 +124,23 @@ def main():
                     instance_public_ips[1], 
                     instance_public_ips[2])
 
+    trusted_host_instance = create_ec2_instance('t2.large', 1, key_name, security_group_id)
+    wait_for_deployment()
+    configure_routing(trusted_host_instance[0].public_ip_address,
+                      proxy_instance[0].public_ip_address)
+    
+    gatekeeper_instance = create_ec2_instance('t2.large', 1, key_name, security_group_id)
+    wait_for_deployment()
+    configure_routing(gatekeeper_instance[0].public_ip_address,
+                      trusted_host_instance[0].public_ip_address)
+
     end = time.time()
     print(f"SQL cluster instances: {instance_public_ips}")
     print(f"File, Position = {master_status["File"]}, {master_status["Position"]}")
     print(f"Proxy: {proxy_instance[0].public_ip_address}")
+    print(f"Trusted Host: {trusted_host_instance[0].public_ip_address}")
+    print(f"Gatekeeper: {gatekeeper_instance[0].public_ip_address}")
+
     print(f"Time taken to run the code was {end-start} seconds")
 
 if __name__ == "__main__":
