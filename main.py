@@ -4,6 +4,9 @@ import time
 import json
 import concurrent.futures
 from create_ec2_instance import create_ec2_instance
+import os
+import benchmarking
+import asyncio
 
 def configure_routing(ip_address, route_ip):
     ip_parts = ip_address.split('.')
@@ -133,6 +136,9 @@ def main():
     wait_for_deployment()
     configure_routing(gatekeeper_instance[0].public_ip_address,
                       trusted_host_instance[0].public_ip_address)
+    
+    os.environ["GATEKEEPER_IP"] = gatekeeper_instance[0].public_ip_address
+    asyncio.run(benchmarking.main())
 
     end = time.time()
     print(f"SQL cluster instances: {instance_public_ips}")
