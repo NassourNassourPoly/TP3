@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Sets up mysql standalone and sakila database, and runs sysbench
+
 # Ensure the script exits if any command fails
 set -e
 

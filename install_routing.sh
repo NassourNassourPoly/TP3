@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Deploys the fastapi app on the proxy using uvicorn.
+# Deploys the fastapi app on the gatekeeper + trusted host using uvicorn.
 
 # Ensure the script exits if any command fails
 set -e

@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI, Request, HTTPException
 import httpx
 
-# Proxy server
+# Gatekeeper + Trusted host server
 app = FastAPI()
 
 # The new server to which requests will be forwarded

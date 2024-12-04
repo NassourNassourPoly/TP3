@@ -3,6 +3,8 @@ import time
 import os
 import aiohttp
 
+# Benchmarking script - self explanatory
+
 # Function to call the endpoint
 async def call_endpoint_http(session, request_num, endpoint, method="get"):
     url = f"http://{os.getenv("GATEKEEPER_IP")}:8000{endpoint}"  # Replace with your actual URL

@@ -7,7 +7,10 @@ from create_ec2_instance import create_ec2_instance
 import os
 import benchmarking
 import asyncio
+import create_security_group
+import shortuuid
 
+# All these configuration scripts are used to run bash scripts with different arguments
 def configure_routing(ip_address, route_ip):
     ip_parts = ip_address.split('.')
     git_bash_path = "C:/Program Files/Git/bin/bash.exe"
@@ -87,10 +90,11 @@ def main():
         creds = json.load(file)
 
     key_name = creds['key_name']
+    vpc_id = creds['vpc_id']
 
     print("Creating a security group...")
-    security_group_id = "sg-0392d0f35327b6529"
-
+    security_group_id = create_security_group.create_security_group(shortuuid.uuid(), 'Security group for EC2 instances', vpc_id)
+    # security_group_id = "sg-0392d0f35327b6529"
     if not security_group_id:
         print("Failed to create security group. Exiting.")
         return
@@ -127,11 +131,13 @@ def main():
                     instance_public_ips[1], 
                     instance_public_ips[2])
 
+    print("Configuring trusted host")
     trusted_host_instance = create_ec2_instance('t2.large', 1, key_name, security_group_id)
     wait_for_deployment()
     configure_routing(trusted_host_instance[0].public_ip_address,
                       proxy_instance[0].public_ip_address)
     
+    print("Configuring gatekeeper")
     gatekeeper_instance = create_ec2_instance('t2.large', 1, key_name, security_group_id)
     wait_for_deployment()
     configure_routing(gatekeeper_instance[0].public_ip_address,
